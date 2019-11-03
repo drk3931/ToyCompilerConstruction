@@ -11,9 +11,8 @@ public class Compiler {
 
     private Reader streamReader;
 
-
-    //if the error flag is triggered it wont write 
-    boolean errorFlag = false; 
+    // if the error flag is triggered it wont write
+    boolean errorFlag = false;
 
     public Compiler() throws Exception {
 
@@ -38,29 +37,22 @@ public class Compiler {
         }
     }
 
-    public boolean isAlpha(char s)
-    {
+    public boolean isAlpha(char s) {
         return Character.isAlphabetic(s);
     }
 
-    private char getLook()
-    {
+    private char getLook() {
         return this.look;
     }
 
-    private void writeToOutput(String s)
-    {
-        if(!errorFlag)
-        {
+    private void writeToOutput(String s) {
+        if (!errorFlag) {
             System.out.println(s);
         }
     }
 
-
-    public char getName()
-    {
-        if(!isAlpha(look))
-        {
+    public char getName() {
+        if (!isAlpha(look)) {
             writeExpected("Name");
 
         }
@@ -70,20 +62,18 @@ public class Compiler {
 
     }
 
-    public char getNumber()
-    {
-        if(!Character.isDigit(look))
-        {
+    public char getNumber() {
+        if (!Character.isDigit(look)) {
             writeExpected("Integer");
         }
-        char num = look; 
+        char num = look;
         getChar();
         return num;
 
     }
 
     public void writeExpected(String expected) {
-        errorFlag = true; 
+        errorFlag = true;
         System.out.println("Error: expected " + expected + ',' + "recieved " + this.look);
     }
 
@@ -92,8 +82,7 @@ public class Compiler {
         try {
 
             int next = this.streamReader.read();
-            while(next == ' ')
-            {
+            while (next == ' ') {
                 next = this.streamReader.read();
             }
             this.look = (char) next;
@@ -106,53 +95,62 @@ public class Compiler {
 
     }
 
-
-    public void expression()
-    {
-    
+    public void expression() {
 
         term();
         writeToOutput("MOVE D0, D1");
 
-        switch(look)
-        {
-            case('+'):{add(); break;}
-            case('-'):{subtract(); break;}
-            default:{writeExpected("Add Operation");}
+        switch (look) {
+        case ('+'): {
+            add();
+            break;
+        }
+        case ('-'): {
+            subtract();
+            break;
+        }
+        default: {
+            writeExpected("Add Operation");
+        }
         }
     }
 
-    public void add()
-    {
+    public void add() {
 
         matchChar('+');
         term();
         writeToOutput("ADD D1,D0");
 
-
     }
-    public void subtract()
-    {
+
+    /*
+     * example:  1 - 2
+     * MOVE# 1,D0 MOVE D0, D1 MOVE# 2,D0 SUBTRACT D1,D0 NEG D0
+     * 
+     *
+     * 
+     * d0 = 2 d1 = 1
+     * 
+     * sub d1 d0 = d0 - d1 = 2 - 1 = 1 -> stores result in d0, d0 * -1 = -1
+     * 
+     * 2 - 1 ends up negating -1 for a result of 1 
+     */
+    public void subtract() {
 
         matchChar('-');
         term();
         writeToOutput("SUBTRACT D1,D0");
+        System.out.println("NEG D0");
 
     }
 
-    public void term()
-    {
-        writeToOutput(
-            "Move# " + getNumber() + ",D0"
-        );
+    public void term() {
+        writeToOutput("MOVE# " + getNumber() + ",D0");
     }
-
-
 
     public static void main(String[] args) throws Exception {
         Compiler c = new Compiler();
-        
-       
+
         c.expression();
 
     }
