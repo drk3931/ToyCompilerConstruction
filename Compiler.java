@@ -95,24 +95,31 @@ public class Compiler {
 
     }
 
+    // <expression> ::= <term> [<addop> <term>]*
     public void expression() {
 
         term();
-        writeToOutput("MOVE D0, D1");
 
-        switch (look) {
-        case ('+'): {
-            add();
-            break;
+        while (look == '+' || look == '-') {
+
+            writeToOutput("MOVE D0, D1");
+
+            switch (look) {
+            case ('+'): {
+                add();
+                break;
+            }
+            case ('-'): {
+                subtract();
+                break;
+            }
+            default: {
+                writeExpected("Add Operation");
+            }
+            }
+
         }
-        case ('-'): {
-            subtract();
-            break;
-        }
-        default: {
-            writeExpected("Add Operation");
-        }
-        }
+
     }
 
     public void add() {
@@ -124,8 +131,7 @@ public class Compiler {
     }
 
     /*
-     * example:  1 - 2
-     * MOVE# 1,D0 MOVE D0, D1 MOVE# 2,D0 SUBTRACT D1,D0 NEG D0
+     * example: 1 - 2 MOVE# 1,D0 MOVE D0, D1 MOVE# 2,D0 SUBTRACT D1,D0 NEG D0
      * 
      *
      * 
@@ -133,7 +139,7 @@ public class Compiler {
      * 
      * sub d1 d0 = d0 - d1 = 2 - 1 = 1 -> stores result in d0, d0 * -1 = -1
      * 
-     * 2 - 1 ends up negating -1 for a result of 1 
+     * 2 - 1 ends up negating -1 for a result of 1
      */
     public void subtract() {
 
