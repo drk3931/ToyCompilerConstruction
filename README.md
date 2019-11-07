@@ -1,5 +1,5 @@
 # ToyCompilerConstruction
-Toy compiler project - generates 68000 assembly 
+Toy compiler project - generates Motorola 68000 assembly 
 
 compiles source.txt
 
